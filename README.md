@@ -1,6 +1,5 @@
 # Assembly-Code
-This is a very simple assembly code 
-created by Fraser Nxumalo as he studied assembly code in 2020 A.D which was officially his first year of research in the fundamentals of the computer science. The low level language of machine code was used to understand the basics of how software worked in the information age. It is very hard to grasp yet with patience and hour's of poundering the meaning of the subject one begins to understands the mechanism's that drive the of the web.
+Fraser Nxumalo as he studied assembly language in 2020 A.D which was officially his first year of research in the fundamentals of the computer science. The low level language of machine code was used to understand the basics of how software worked in the information age. It is very hard to grasp yet with patience and hour's of poundering the meaning of the subject one begins to understands the mechanism's that drive the of the web.
 
 When i was a student at the University of the Western Cape I came across a book called 
 
