@@ -6,7 +6,7 @@ When i was a student at the University of the Western Cape I came across a book 
 
 "THE REVOLUTIONARY GUIDE TO ASSEMBLY LANGUAGE" by VITALY MALJUGIN, JACOV IZRAILEVICH, SEMYON LAVIN AND ALEKSANDER SOPIN. 
 
-This book change my approach in which i saw computers it facinated me from the get go.
+This book changed my life in how i saw computers.
 
 In order to run the programs, you will need to install ...
 
