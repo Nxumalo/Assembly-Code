@@ -25,7 +25,6 @@ PrtRes:
       OutIntax
       NewLine
       jmp Next
- 
 ExCycle:
       mov ax,4C00h
       int 21h
