@@ -8,7 +8,7 @@ Hex dw 16
 
 NetCh: mov ah,01
        int 21h
-       cmp a1,0
+       cmp a1,0 
        jne Notspec
        int 21h
        jmp FinProg
