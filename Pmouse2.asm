@@ -110,4 +110,102 @@ Nomouse:
 				WaitKey
 					jmp Exit
 					
+Begin: 		OutMsg TEXT2
+		WaitKey 
+		
+Func0:		
+		xor ax,ax
+		int 33h
+		cmp ax,0
+		jnz Clear25
+		jmp Exit
+
+Clear25:	SetCurs 0,0
+		mov ah,9
+		xor bh,bh
+		mov al,20h
+		mov bl,1Eh
+		mov cx,2000
+		int 10h
+		
+		PutStr 2,16,TEXT3,Ltxt3,1Eh
+		PutStr 8,20,TEXT8,Ltxt8,1Eh
+		PutStr 10,20,TEXT10,Ltxt10,1Fh
+		PutStr 11,20,TEXT11,Ltxt11,1Fh
+		PutStr 12,20,TEXT12,Ltxt12,1Fh
+		PutStr 13,20,TEXT13,Ltxt13,1Fh
+		PutStr 14,20,TEXT14,Ltxt14,1Fh
+		PutStr 15,20,TEXT15,Ltxt15,1Fh
+SetCurs 25,80
+
+Func10: 	mov ax,10
+		xor bx,bx
+		mov cx,0FFFFh
+		mov dx,4700h
+		int 33h
+		
+Func1:		mov ax,1
+		int 33h
+		
+Func3:		mov ah,1
+		int 16h
+		jz ContF3
+		jmp Exit
+		
+ContF3:		mov ax,3
+		int 33h
+		mov CX0,cx
+		mov DX0,dx
+		test bx,1
+		jnz X_Range
+		jmp short Func3
+		
+X_Range:	mov ax,CX0
+		mov cl,3
+		shr ax,cl
+		cmp ax,20
+		jb Func3
+		cmp ax,36
+		ja Func3
+		
+Y_Range:	mov ax,DX0
+		mov cl,3
+		shr ax,cl
+		cmp ax,10
+		jb Func3
+		cmp ax,15
+		ja Func3
+		
+		mov ax,DX0
+		mov cl,3
+		shr ax,cl
+		cmp ax,15
+		je Exit
+		sub ax,9
+		or al,30h
+		mov Numsel,al
+		SetCurs 17,20
+		OutMsg TXT3L
+		jmp short Func3
+		
+Exit:		mov al,VMODE
+		mov ah,0
+		int 10h
+		Call CLRKEY
+		mov ax,4C00h
+		int 21h
+		
+CLRKEY 		PROC Near uses ax es
+		mov ax,40h
+		mov ES,ax
+		cli
+		mov ax,ES:[1Ah]
+		mov ES:[1Ch],ax
+		sti
+		ret
+		
+CLRKEY		ENDP
+		END
+		
+					
 			
