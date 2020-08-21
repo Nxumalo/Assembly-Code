@@ -9,29 +9,30 @@ IsSet  db 'The trap flag is set successfully.Not active '
        db 'debugger found. '0Dh,OAh,'$'
 .code
 .startup
-       lea dx,TitMsf
-       mov ah,09
-       int 21h
-       pushf
-       pop ax
-       or ax,0100h
-       push ax
-       popf
-       pushf
-       pop ax
-       and ax,0100h
-       lea dx,IsSet
-       cmp ax,0
-       jne OutMsg
-       lea dx,NotSet
-OutMsg: mov ah,09
-        int 21h
-        pushf
-        pop ax
-        and ax,not 0100h
-        push ax
-        popf
-        mov ax,4C00h
-        int 21h
+       lea dx,TitMsf        ;address of initial message
+       mov ah,09            ;function 09 - output text string
+       int 21h              ;Dos service call
+       pushf                ;push original flags
+       pop ax               ;copy original glags into AX
+       or ax,0100h          ;set bit 8 - Trap flag
+       push ax              ;push flags value to be set
+       popf                 ;pop flags value to be set
+       pushf                ;push new flags value 
+       pop ax               ;copy new flags into AX
+       and ax,0100h         ;separate bit 8 - highlight TF
+       lea dx,IsSet         ; Address of message "TF os set"
+       cmp ax,0             ; is bit 8 clear?
+       jne OutMsg           ; is not ,putput message
+       lea dx,NotSet        ;address of message "cannot set TF"
+
+OutMsg: mov ah,09           ;function 09 - output text string           
+        int 21h             ;Dos service call
+        pushf               ;push original flags
+        pop ax              ;copy original flag into AX
+        and ax,not 0100h    ;clear bit 8 - Trap flag
+        push ax             ;push flags value to be set
+        popf                ;pop flags with TF clear
+        mov ax,4C00h        ;function 4Ch - terminate process 
+        int 21h             ;Dos service call
         end
   
