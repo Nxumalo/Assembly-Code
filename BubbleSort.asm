@@ -9,7 +9,7 @@
 ;DX    - number of elements
 ;Sorting oder
 ;AX = 0 - increasing
-      1 - decreasing 
+;      1 - decreasing 
 ;Output (error code in the AX register)
 ;AX = 0 - normal finish
 ;     1 - elements longer than 46 bytes 
