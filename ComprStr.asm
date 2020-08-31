@@ -13,16 +13,16 @@ Str2              byte      'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
                   NewLine
                           OutMsg  'Enter alphabet character: ABC... in capital letters:'
                   NewLine
-                  mov       ah,0Ah
-                  lea       dx,StrBuf
-                  int       21h
+                  mov       ah,0Ah        ;function 0Ah - input stromg 
+                  lea       dx,StrBuf     ;DS:DX - buffer address
+                  int       21h           ;DOS service call 
                   .IF       ActLen<1
                   .exit     1
                   .ENDIF
-                  lea       di,Str2
-                  lea       si,Str1
-                  mov       ch,0
-                  mov       cl,ActLen
+                  lea       di,Str2       ;ES:DI point to string 2 (comparand)
+                  lea       si,Str1       ;DS:SI point to string 1 (entered)
+                  mov       ch,0          ;clear high byte of CX
+                  mov       cl,ActLen     ;CX contaos length of string
                   .IF       cx > LengthOf Str2
                   mov       cx,LengthOf Str2
                   .ENDIF
@@ -33,8 +33,8 @@ Str2              byte      'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
                   OutMsg    'Compared with: '
                   OutBytes  Str2,LengthOf Str2
                   NewLine
-                  cld
-repe              cmpab
+                  cld                     ;process string from left to right 
+repe              cmpab                   ;compare strings
                   .IF ZERO?
                             OutMsg 'Right'
                   .Else
