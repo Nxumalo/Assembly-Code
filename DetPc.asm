@@ -1,7 +1,7 @@
 .model large
 HiBios segment at 0F000h
        org 0FFFEh
-PcType db ?                        :Computer identifier 
+PcType db ?                        ;Computer identifier 
 HiBios ends
 
 .code
