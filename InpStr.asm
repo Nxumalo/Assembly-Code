@@ -13,46 +13,47 @@ FactInp db 0
 Str1    db 256 dup('$')
 .code 
 .startup
-            mov ah,09
-            lea dx,Msg16
-            int 21h
-            mov bx,0
-
-Next16:     mov ah,0
-            int 16h
-            cmp al 0
-            je  Next16
-            mov Str1[bx],al
-            inc bx
-            cmp al,CR
-            jne Next16
-            
-            mov Str1[bx],LF
-            mov Str1[bx+1],'$'
-            
-            mov ah,09
-            lea dx,Str1
-            int 21h
-            
-            mov ah,09
-            lea dx,Msg21
-            int 21h
-            
-            mov ah,0Ah
-            lea dx,ReqInp
-            int 21h
-            
-            mov bl,FactInp
-            mov bh,0
-            mov Str1[bx],CR
-            mov Str1[bx+1],LF
-            mov Str1[bx+2],'$'
-            
-            mov ah,09
-            lea dx,MsgOut
-            int 21h
-            lea dx,Str1
-            int 21h
+;===        Output mesage about BIOS service 
+            mov ah,09                ;function 09 - output text spring 
+            lea dx,Msg16             ;address of message 'BOPS service'
+            int 21h                  ;DOS service call 
+;===        Creating string from characters (BIOS service)            
+            mov bx,0                 ;BX - number of current character 
+Next16:     mov ah,0                 ;function 00h - read character 
+            int 16h                  ;BIOS keyboard service
+            cmp al 0                 ;special key?
+            je  Next16               ;ignore special key and read next
+            mov Str1[bx],al          ;store current character into string 
+            inc bx                   ;increase counter to store next char
+            cmp al,CR                ;ENTER key [ressed (Carriage Return)?
+            jne Next16               ;if not, read next character
+;===        Append character CR and LF to the end of the String            
+            mov Str1[bx],LF          ;add Line Feed to the end of string 
+            mov Str1[bx+1],'$'       ;End Message character
+;===        Output header and string entered            
+            mov ah,09                ;function 09 - output text string 
+            lea dx,Str1              ;address of message 'Text entered'   
+            int 21h                  ;DOS service call
+;===        Output message about DOS service             
+            mov ah,09                ;function 09 - outout text string  
+            lea dx,Msg21             ;address of message 'BIOS service'
+            int 21h                  ;DOS service call
+;===        Input text string (DOS service)            
+            mov ah,0Ah               ;function 0Ah - input text string    
+            lea dx,ReqInp            ;DS:DX - address of input buffer    
+            int 21h                  ;DOS service call
+;===        Append character CR and LF to the end of the string             
+            mov bl,FactInp           ;length of string actually read    
+            mov bh,0                 ;high byte of length =0 (length < 256)   
+            mov Str1[bx],CR          ;Append Carriage Return    
+            mov Str1[bx+1],LF        ;Append Line Feed    
+            mov Str1[bx+2],'$'       ;Append End of Message
+;===        Output header and string entered            
+            mov ah,09                ;function 09 - output text string    
+            lea dx,MsgOut            ;address of message 'Text entered'   
+            int 21h                  ;DOS service call   
+            lea dx,Str1              ;address of string obtained   
+            int 21h                  ;DOS service call   
 .exit
 end
             
