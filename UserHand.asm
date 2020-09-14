@@ -29,18 +29,18 @@ Install:                                ;Installation starts here
         add dx,15
         mov cx,4                        ;Set counter for shift 
         shr dx,cl                       ;4 bits to the right - divide by 16
-        add dx,16                       ;Ad size of 
-        mov ax,3100h
-        int 21h
+        add dx,16                       ;Add size of PSP in paragraphs 
+        mov ax,3100h                    ;Terminate and 
+        int 21h                         ;stay resident 
         
  already:
-        push cs
-        pop ds
-        lea dx,loaded
-        mov ax,0900h
-        int 21h
-        mov ax,4C01h
-        int 21h
+        push cs                         ;Copy the value of CS
+        pop ds                          ;into the register DS
+        lea dx,loaded                   ;DX := address of message text
+        mov ax,0900h                    ;Function 09 - output string 
+        int 21h                         ;DOS service call
+        mov ax,4C01h                    ;Function 4Ch-stop (return code 01)
+        int 21h                         ;DOS service call
         
 loaded db 'User handler is already loaded!',10,13,'$'
 Code Ends
