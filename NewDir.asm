@@ -1,0 +1,16 @@
+DATA SEGMENT
+PATH DB "D:\DIRECT1\NEWDIRE",0        ;ASCIIZ string for path 
+.......................................................
+DATA ENDS 
+.......................................................
+CODE SEGMENT 
+        mov ax,DATA                   ;base address
+        mov ds,ax                     ;of data segment
+        lea dx,PATH                   ;DS:DX - address of full path
+        mov ah,39h                    ;function 39h - create subdirectory
+        int 21h                       ;call MS-DOS service
+        jc error                      ;error, if carry flag = 1
+        ..........................
+        ..........................
+CODE ENDS
+....................................................
