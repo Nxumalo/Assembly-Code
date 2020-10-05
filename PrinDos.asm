@@ -1,3 +1,13 @@
+;*************************************************************************************
+;
+;	The program for outputting text string onto the printer 
+;
+; 	Author: F. Nxumalo, University of the Western Cape, 2020
+;
+;	The MS-DOS service (INT 21h, function 40h ) is use
+;
+;************************************************************************************
+;----------------------------------------------------
 DATA SEGMENT 
 CR EQU 13
 LF EQU 10
@@ -8,34 +18,34 @@ MSG2 DB 13,10,'Error while outputting the string !',13,10,'$'
 MSG3 DB 13,10,'Printer not ready!',13,10,'$'
 MSG4 DB 13,10,'Error during printer initialization!',13,10,'$'
 DATA ENDS 
-
+;----------------------------------------------------
 CODE SEGMENT 'CODE'
 		ASSUME CS:CODE,DS:DATA
-		
+; === Check whether printer is ready 		
 Begin:	mov ax,DATA
-		mov DS,ax
-		mov ah,02h
-		xor dx,dx
-		int 17h
-		cmp ah,90h
-		je Print 
-		lea dx,MSG3
-		jmp Text
-		
-Print:  mov cx,LMSG1
-		lea dx,MSG1
-		mov bx,4
-		mov ah,40h
-		int 21h
-		jnc Exit
-		
-Error:  lea dx,MSG2
-
-Text:  	mov ah,9
-		int 21h
-	
-Exit:	mov ax,4c00h
-		int 21h
+		mov DS,ax			;DS points to data segment 
+		mov ah,02h			;function 02h - get printer status byte
+		xor dx,dx			;DX = 0 corresponds to LPT1
+		int 17h				;BIOS printer service
+		cmp ah,90h			;check bits 7 and 4 of status byte
+		je Print 			;if printer is OK - print 
+		lea dx,MSG3			;address of message "not ready"
+		jmp Text			;output message and exit 
+;----------------------------------------------------
+; === Output ASCII string onto the printer 
+Print:  mov cx,LMSG1				;length of string to be output 	
+		lea dx,MSG1			;DS:DX - address of begining of string 
+		mov bx,4			;4 is value of file handle for LPT1
+		mov ah,40h			;function 40h - write file with handle 
+		int 21h				;DOS service call 
+		jnc Exit			;if Carry Flag is clear, exit 		
+Error:  lea dx,MSG2				;else output error message
+;----------------------------------------------------
+; === This is the final block 
+Text:  	mov ah,9				; function 09h - output text 
+		int 21h				;DOS service call 
+Exit:	mov ax,4c00h				;Function 4Ch - terminate process
+		int 21h				;Return to MS-DOS 
 	
 CODE ENDS 
 	 ENG Begin
