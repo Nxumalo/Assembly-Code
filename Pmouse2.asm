@@ -1,7 +1,19 @@
+;*************************************************************************************************************
+;
+; The demo program for mouse (the menu selection,Text Mode)
+;
+; Author: F.Nxumalo, Unversity of the Western Cape, 2020
+;
+; The Interrupt 33h (mouse service is used)
+;
+; Mouse driver must be installed 
+; 
+;*************************************************************************************************************
 NAME PMOUSE2
 .DOSSEG
 .MODEL SMALL
 .STACK 100h
+;________________________________________________________________
 .DATA
 BELL EQU 07
 LF EQU 10
@@ -35,26 +47,27 @@ NumSel DB 20h
 	   DB " selected."
 	   DB BELL,"$"
 	   
-VMODE DB 0
-ATTR  DB 0
+VMODE DB 0			; video mode saved 
+ATTR  DB 0			; 
 ROW0  DB 0
 COL0  DB 0
 CX0   DW 0
 DX0   DW 0
+;____________________________________________________
 .CODE
 
-OutMsg macro Txt
-		lea dx,Txt
-		mov ah,09h
-		int 21h
-		endm
+OutMsg macro Txt	;===== output text message 
+		lea dx,Txt		; address of message
+		mov ah,09h		; function 09h - output text string 
+		int 21h			; DOS service call
+		endm			
 		
-WaitKey macro 
-		xor ah,ah
-		int 16h
+WaitKey macro 		;==== Wait for keypressed 
+		xor ah,ah		; function 0 - wait for key pressed 
+		int 16h			; BIOS keyboard service 
 endm
 
-SetCurs MACRO ROW,Column
+SetCurs MACRO ROW,Column		; 
 		mov ah,2
 		xor bh,bh
 		mov dh,&ROW
