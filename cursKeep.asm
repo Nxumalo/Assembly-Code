@@ -1,60 +1,58 @@
 NewFunc equ 0E0h
-CheckIn equ 51h
+CheckIn equ 51h				; subfunction " check installation "
 
-_Text segment para public 'CODE'
+_Text segment para public 'CODE'	
 		assume cs:_Text
-		
-NumFun		db ?
-SaveAx		dw ?
-SaveBx		dw ?
-SaveCx		dw ?
-SaveDx		dw ?
-
-Handler proc near
-		cmp 	ah,NewFunc
-		je		Addf
-		
-Process:	pushf
-			mov NumFun,ah
-			cmp ah,1
-			jne VidCall
-			cmp cl,8
-			jb  VidCall
-			mov cl,7
-			shr ch,1
+; =========================== Resident Data ===================================		
+NumFun		db ?				; number of interrupt 10h function 
+SaveAx		dw ?				; register AX will be saved here 
+SaveBx		dw ?				; register BX will be saved here
+SaveCx		dw ?				; register CX will be saved here
+SaveDx		dw ?				; register DX will be saved here 
+; ========================== Resident Code ====================================
+Handler proc near				; additional handler for interrupt 10h
+		cmp 	ah,NewFunc		; additional function of INT 10h?
+		je		Addf		; new handler for that function 					
+Process:	pushf				; new handler for INT 10h starts here
+			mov NumFun,ah		; save number of function called 
+			cmp ah,1		; is it function "Set Cursor Type"
+			jne VidCall		; if not call standard handler 
+			cmp cl,8		; is cursor end line greater than 7 
+			jb  VidCall		; if not, call standard handler 
+			mov cl,7		; otherwise replace cursor end line with 7
+			shr ch,1		; divide value of start line by 2 
 			
-VidCall: 	call dword ptr OldHand
-				cmp NumFun.0
-				je ModCurs
-				cmp NumFun,11h
-				je ModCurs
-				iret
+VidCall: call dword ptr OldHand		;call BIOS video interrupt 
+		cmp NumFun.0		;function 0 - Set Video Mode?
+		je ModCurs		;if so, reprogram cursor 
+		cmp NumFun,11h		;was it function 11 - Character set?
+		je ModCurs		;if so, reprogram cursor 
+		iret			;return from interrupt handler 
 				
 ModCurs: 	pushf
-			mov SaveAx,ax
-			mov SaveBx,bx
-			mov SaveCx,cx
-			mov SaveDx,dx
-			mov ah,03h
-			mov bx,0
-			pushf
-			call dword ptr OldHand
-			mov ah,ch
-			and ah,1Fh
-			cmp ah,6
-			jb ModCL
-			and ch,07h
-			or ch,06h
-			
-ModCL:		mov cl,07h
-			mov ah,01h
-			pushf
-			call dword ptr OldHand
-			mov dx,SaveDx
-			mov cx,SaveCx
-			mov bx,SaveBx
-			mov ax,SaveAx
-			popf
+			mov SaveAx,ax			;save AX in memory, without using stack
+			mov SaveBx,bx			;save BX in memory, without using stack  
+			mov SaveCx,cx			;save CX in memory, without using stack
+			mov SaveDx,dx			;save DX in memory, without using stack 
+			mov ah,03h			;function 03 - get cursor position
+			mov bx,0			;video page 0
+			pushf				;imitate interrupt 
+			call dword ptr OldHand		;call BIOS video interrupt 
+			mov ah,ch			;cursor start line into AH
+			and ah,1Fh			;bits 0 - 4 are significant
+			cmp ah,6			;is start line greater than 6!
+			jb ModCL			;if not, modify end line
+			and ch,07h			;4 low bits (value 0 - 15)
+			or ch,06h			;divide start line by 2			
+ModCL:		mov cl,07h				;end line will always be 7
+			mov ah,01h			;function 01 - get cursor position
+			pushf				;imitate interrupt 
+			call dword ptr OldHand		;call BIOS video interrupt 
+			mov dx,SaveDx			;restore DX from memory
+			mov cx,SaveCx			;restore CX from memory
+			mov bx,SaveBx			;restore BX from memory 
+			mov ax,SaveAx			;restore AX from memory 
+			popf				;restore orginal flags 
 	
 NoMod: iret
 
@@ -122,7 +120,7 @@ CR	equ 0Ah
 Lf	equ 0Dh
 EndMsg equ 24h
 BegMsg	db CR,LF 'resident cGA-compatible cursor keeper.'
-		db CR,LF 'Copyright(C) 1992 V.B. Maljugin, Voronezh'
+		db CR,LF 'Copyright(C) 2020 F. Nxumalo Unversity of the Western Cape, South Africa '
 		
 CRLF	db CR,LF,EndMsg
 AlrMsg  db CR,LF,'Program has been installed!',CR,LF,EndMsg
