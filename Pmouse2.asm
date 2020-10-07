@@ -62,85 +62,87 @@ OutMsg macro Txt	;===== output text message
 		int 21h			; DOS service call
 		endm			
 		
-WaitKey macro 		;==== Wait for keypressed 
+WaitKey macro 		;==== Wait for key pressed 
 		xor ah,ah		; function 0 - wait for key pressed 
 		int 16h			; BIOS keyboard service 
 endm
 
-SetCurs MACRO ROW,Column		; 
-		mov ah,2
-		xor bh,bh
-		mov dh,&ROW
-		mov dl,&Column
-		int 10h
+SetCurs MACRO ROW,Column		; ==== Move the cursor 
+		mov ah,2		; function 02h - set cursor position
+		xor bh,bh		; video page 0 is used
+		mov dh,&ROW		; cursor row 
+		mov dl,&Column		; cursor column
+		int 10h			;BIOS video service call
 		
 ENDM
 
 PutStr MACRO Row,Column,Text,Leng,Attrib
 			Local M0
 			push si 
-			mov cx,Leng
-			lea si,Text
-			mov dl,Column
-			cld
+			mov cx,Leng			;string length 
+			lea si,Text			;DS:SI - address of text string 
+			mov dl,Column			;initial position (column)
+			cld				;process string from left to right 
 
-			M0: SetCurs Row,dl
-			lodsb
-			mov bl Attrib
-			mov ah,9
-			xor bh,bh
-			push cx
-			mov cx,1
-			int 10h
-			pop cx
-			inc dl
-			loop M0
-			pop si
+			M0: SetCurs Row,dl		
+			lodsb				;AL - character to be output 
+			mov bl Attrib			;BL - attribute 
+			mov ah,9			;function 09 - output char+ attr 
+			xor bh,bh			;video page 0 is used 
+			push cx				;save cycle counter 
+			mov cx,1			;number of characters output 
+			int 10h				;BIOS video service call
+			pop cx				;restore cycle counter 
+			inc dl				;next position for output 
+			loop M0				;next cycle step 
+			pop si				;
 			ENDM
-	
+;___________________________________________________________	
 .STARTUP
-				mov ah,0Fh
-				int 10h
-				mov VMODE,al
-				mov ah,0
-				mov al,3
-				int 10h
-				
-				OutMsg TEXT0
-				WaitKey
-				
-				mov  ax,03533h
-				int 21h
-				mopv ax,es
-				or ax,bx
-				jz Nomouse
-				mov bl,es:[bx]
-				cmp bl,0CFh
-				jne Begin
-				
+				mov ah,0Fh		;function 0Fh - get video mode 
+				int 10h			;BIOS video service call
+				mov VMODE,al		;save current video mode 
+				mov ah,0		;function 0 - set video mode 
+				mov al,3		;80x25 Text
+				int 10h			;BIOS video service call
+;	Output initial message						
+				OutMsg TEXT0		;output initial message 
+				WaitKey			
+; 	check for mouse driver present 				
+				mov  ax,03533h		;function 35h - get interrupt vector 
+				int 21h			;DOS service call
+				mopv ax,es		;segment address of handler 
+				or ax,bx		;AX - segment .OR. offset of int 33
+				jz Nomouse		;if full address is 0 - no mouse 
+				mov bl,es:[bx]		;get first instruction of handler 
+				cmp bl,0CFh		;is this IRET instruction?
+				jne Begin		;if not - driver installed 				
 Nomouse:	
-				OutMsg TEXT1
-				WaitKey
-					jmp Exit
-					
-Begin: 		OutMsg TEXT2
-		WaitKey 
-		
-Func0:		
-		xor ax,ax
-		int 33h
-		cmp ax,0
-		jnz Clear25
-		jmp Exit
-
-Clear25:	SetCurs 0,0
-		mov ah,9
-		xor bh,bh
-		mov al,20h
-		mov bl,1Eh
-		mov cx,2000
-		int 10h
-		
+				OutMsg TEXT1		;output message "driver not found"
+				WaitKey			;wait for key to be pressed
+					jmp Exit	;Exit program
+;__________________________________________________					
+Begin: 		OutMsg TEXT2				;output message "driver installed"
+		WaitKey 				;wait for key to be pressed 
+			jmp Exit 			;Exit program 
+;__________________________________________________
+; Initialize mouse and report status (function 0 of INT 33h)
+Func0:							
+		xor ax,ax				;Initialize mouse 
+		int 33h					;mouse service call
+		cmp ax,0				;is mouse installed 
+		jnz Clear25				;if so, pass to function 10
+		jmp Exit				;if not,exit program 
+; Fill the screen (yellow character on blue background)
+Clear25:	SetCurs 0,0				;cursor to left upper corner
+		mov ah,9				;function 09h - output char+attr
+		xor bh,bh				;video page 0 is used 
+		mov al,20h				;character to be output 
+		mov bl,1Eh				;attribute - yellow on blue 
+		mov cx,2000				;number of character to be output 
+		int 10h					;BIOS video service call
+;___________________________________________________
+;  Output the header and the menu text onto the screen
 		PutStr 2,16,TEXT3,Ltxt3,1Eh
 		PutStr 8,20,TEXT8,Ltxt8,1Eh
 		PutStr 10,20,TEXT10,Ltxt10,1Fh
@@ -149,76 +151,81 @@ Clear25:	SetCurs 0,0
 		PutStr 13,20,TEXT13,Ltxt13,1Fh
 		PutStr 14,20,TEXT14,Ltxt14,1Fh
 		PutStr 15,20,TEXT15,Ltxt15,1Fh
-SetCurs 25,80
-
-Func10: 	mov ax,10
-		xor bx,bx
-		mov cx,0FFFFh
-		mov dx,4700h
-		int 33h
-		
-Func1:		mov ax,1
-		int 33h
-		
-Func3:		mov ah,1
-		int 16h
-		jz ContF3
-		jmp Exit
-		
-ContF3:		mov ax,3
-		int 33h
-		mov CX0,cx
-		mov DX0,dx
-		test bx,1
-		jnz X_Range
-		jmp short Func3
-		
-X_Range:	mov ax,CX0
-		mov cl,3
-		shr ax,cl
-		cmp ax,20
-		jb Func3
-		cmp ax,36
-		ja Func3
-		
-Y_Range:	mov ax,DX0
-		mov cl,3
-		shr ax,cl
-		cmp ax,10
-		jb Func3
-		cmp ax,15
-		ja Func3
-		
-		mov ax,DX0
-		mov cl,3
-		shr ax,cl
-		cmp ax,15
-		je Exit
-		sub ax,9
-		or al,30h
-		mov Numsel,al
-		SetCurs 17,20
-		OutMsg TXT3L
-		jmp short Func3
-		
-Exit:		mov al,VMODE
-		mov ah,0
-		int 10h
-		Call CLRKEY
-		mov ax,4C00h
-		int 21h
-		
+SetCurs 25,80		; move cursor out of screen 
+;___________________________________________________
+; Function 10 - define text cursor 
+Func10: 	mov ax,10				;define text cursor 
+		xor bx,bx				;software cursor is used 
+		mov cx,0FFFFh				;screen Mask 
+		mov dx,4700h				;cursor Mask 
+		int 33h					;mouse service call
+;______________________________________________________	
+; Function 1 - show the mouse cursor 
+Func1:		mov ax,1				;function 01 - show mouse cursor 
+		int 33h					;mouse service call
+;______________________________________________________
+; Determining mouse keys pressed 
+Func3:		mov ah,1				;function 01h - check keyboard buffer
+		int 16h					;BIOS keyboard service
+		jz ContF3				;if no key pressed, continue 
+		jmp Exit				;exit if key pressed 		
+ContF3:		mov ax,3				;func. 03 - button status and location 
+		int 33h					;mouse service call
+		mov CX0,cx				;save X coordinate (column)
+		mov DX0,dx				;save Y coordinate (row)
+		test bx,1				;left button pressed?
+		jnz X_Range				;Ok!
+		jmp short Func3				; no button pressed - check again
+; Check horizontal cursor location 		
+X_Range:	mov ax,CX0				;X coordinate (Column)
+		mov cl,3				;number bits to shift 
+		shr ax,cl				;shifts by 3 - divide by 8
+		cmp ax,20				;cursor on the left ?
+		jb Func3				;not - continue check 	
+		cmp ax,36				;cursor on the right?
+		ja Func3				;not - continue check
+; Check vertical cursor location		
+Y_Range:	mov ax,DX0				;X coordinate (Column)
+		mov cl,3				;number bits to shift 
+		shr ax,cl				;shift by 3 - divide by 8
+		cmp ax,10				;cursor on the top?
+		jb Func3				;not - continue check 
+		cmp ax,15				;cursor on the bottom?
+		ja Func3				;not - continue check 
+; report the number of the command selected 		
+		mov ax,DX0				;Y coordinate (Column)
+		mov cl,3				;number bits to shift
+		shr ax,cl				;shift by 3 - divide by 8
+		cmp ax,15				;line 15 (Exit)?
+		je Exit					;if so - finish 
+		sub ax,9				;number of command selected
+		or al,30h				;convert ASCII character 
+		mov Numsel,al				;out number to output message
+		SetCurs 17,20				;move cursor 
+		OutMsg TXT3L				;output message "command selected"
+		jmp short Func3				;check again
+;______________________________________________
+Exit:		mov al,VMODE				;remember video mode on entry
+		mov ah,0				;function 0 - set video mode 
+		int 10h					;BIOS video service 
+		Call CLRKEY				;clear keyboard buffer 
+		mov ax,4C00h				;function 4Ch - terminate process
+		int 21h					;DOS service call
+;______________________________________________
+;
+; This procedure cleas the keyboard buffer
+;
+;______________________________________________
 CLRKEY 		PROC Near uses ax es
-		mov ax,40h
-		mov ES,ax
-		cli
-		mov ax,ES:[1Ah]
-		mov ES:[1Ch],ax
-		sti
+		mov ax,40h				;address of BISO data segment 
+		mov ES,ax				;ES points to BIOS data
+		cli					;no interrupts - system data modified 
+		mov ax,ES:[1Ah]				;buffer head printer
+		mov ES:[1Ch],ax				;clear buffer (head ptr = tail ptr)
+		sti					;buffer clear allow interrupts
 		ret
 		
 CLRKEY		ENDP
 		END
 		
-					
-			
+				
