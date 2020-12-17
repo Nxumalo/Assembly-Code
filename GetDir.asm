@@ -10,7 +10,7 @@ CODE SEGMENT
 ;first 3 positions reserved for disk name and separator
       mov word ptr PATH+1,'\:';   place separator into buffer
       lea si,PATH+3           ;DS:SI - address of buffer
-      mov ah,47h              ;fucntion 47h - get current directory 
+      mov ah,47h              ;function 47h - get current directory 
       int 21h                 ;call MS-DOS service 
       jc error                ;error,if carry flag = 1
 ;get the current disk name 
