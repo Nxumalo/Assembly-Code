@@ -12,7 +12,7 @@ main proc                          ;declare main procedure
      
      ;Procedure section
      
-Display_Dx Proc                    ;deckare procedure Display_DX
+Display_Dx Proc                    ;declare procedure Display_DX
          Ret                       ;return to MAIN
 Display_Dx ENDP                    ;end of procedure
 
