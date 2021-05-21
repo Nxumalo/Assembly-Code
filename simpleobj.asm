@@ -1,7 +1,7 @@
 .model tiny
 .stack
 .data
-Msg db 'This is a very simple assembly code created by Fraizer Nxumalo'
+Msg db 'This is a very simple assembly code '
     db 'program' ,0Ah,0Dh,'$'
 .code
 .startup
