@@ -1,7 +1,8 @@
 TITLE Hello Example Program     ;https://www.silentcode.za
 OurProg SEGMENT PARA 'CODE'     ;declare code segment
         ORG 100H
-        ASSUME CS:OurProg, DS:OurProg, ES:OurProg,SS:OurProg ; information on program instruction
+        ASSUME CS:OurProg, DS:OurProg, ES:OurProg,SS:OurProg 
+        ; information on program instruction
 Start:  JMP Begin         ;jump over data definition
 Hello   DB ' Hello!$'     ;define string to display
 Begin:  LEA dx,Hello      ;DS:DX - effective address of string
