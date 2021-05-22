@@ -1,7 +1,8 @@
-TITLE Hello A Simple Hello    ;title is not necessary
+TITLE Hello A Simple Hello    ; https://www.silentcode.za
 .model tiny
 .data
-Hello Db 'Hello! Neo Nxumalo the Matrix has found You :--:---:--. $' ;define string to display
+Hello Db 'Hello! Neo the Matrix has found You :--:---:--. $' 
+                                        ;define string to display
 .code
 .startup
           lea Dx,Hello World            ;DS:DX -  effectove address of string
