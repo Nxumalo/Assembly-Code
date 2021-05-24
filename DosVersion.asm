@@ -3,8 +3,10 @@
 ;     02 Semptember 2020
 
 ;     This programs gets the DOS version number and sets 
-;     the return code equal to DOS version number and sets the return code to equal its value.
-;     You can use this result in BAT-files with the help of ErrorLevel function.
+;     the return code equal to DOS version number and sets the
+;     return code to equal its value.
+;     You can use this result in BAT-files with the help of
+;     ErrorLevel function.
 ;     You can get either the major or minor part of the number.
 ;     To get the major part of the number,pass the letter H to 
 ;     the program as a parameter by typung the following command.
