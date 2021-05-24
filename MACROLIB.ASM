@@ -1,7 +1,8 @@
 .XLIST
 ;           Macro Definition
 ;__________________________________________________________
-;
+;      the sequence of instructions
+;__________________________________________________________
 InpInt macro Dest
       local Read, ExitMac, Number
       push cx
