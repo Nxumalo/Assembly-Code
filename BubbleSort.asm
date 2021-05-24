@@ -1,5 +1,5 @@
 ;Character arrays sorting. Version 1.4
-;Author: Fraser Nxumalo, University of the Western Cape 2020/08/31
+;Author: 3538264, University of the Western Cape 2020/08/31
 ;Using from assembler programs
 ;Call Bubble Sort algorithm is used
 ;Parameters passed
