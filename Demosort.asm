@@ -1,5 +1,5 @@
 ;Array Sorting; demo program
-;Author: Fraser Nxumalo, University of the Western Cape 2020
+;Author: 3538264, University of the Western Cape 2020
 ;*****************************************************************************************************************************
 Extrn Bsort : Far
 .model small
