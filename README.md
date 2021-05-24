@@ -2,7 +2,12 @@
 As I studied assembly language in 2020  which was my first year of research in the fundamentals of the computer science. The low-level language of machine code was used to understand the basics of how software worked in the information age. It is very hard to grasp yet with patience and hour's of poundering the meaning of the subject one begins to understands the way programming works.
 
 Fundatmental knowledge
+
 The most basic observation that can be made is Algorithms + Data Structures = Programs.
+What is Dos?
+"Disk Operating System", refers to the operating system resident of a magnetic disk.
+Times have changed and now we use "DOS" meaning the operating system for personal computers,
+systems such as Microsoft, IBM for digital research.
 
 When i was a student at the University of the Western Cape I came across a book called
 "THE REVOLUTIONARY GUIDE TO ASSEMBLY LANGUAGE" by VITALY MALJUGIN, JACOV IZRAILEVICH, SEMYON LAVIN AND ALEKSANDER SOPIN. 
