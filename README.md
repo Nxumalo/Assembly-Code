@@ -7,8 +7,9 @@ The most basic observation that can be made is Algorithms + Data Structures = Pr
 What is Dos?
 "Disk Operating System", refers to the operating system resident of a magnetic disk.
 Times have changed and now we use "DOS" meaning the operating system for personal computers,
-systems such as Microsoft, IBM for digital research.
-
+systems such as Microsoft, IBM for digital research. Computers are designed for specifically
+operating with numbers. Counting has influenced history so much so,that name Calculator is the 
+Latin word for Calculus which means pebble.
 When i was a student at the University of the Western Cape I came across a book called
 "THE REVOLUTIONARY GUIDE TO ASSEMBLY LANGUAGE" by VITALY MALJUGIN, JACOV IZRAILEVICH, SEMYON LAVIN AND ALEKSANDER SOPIN. 
 
