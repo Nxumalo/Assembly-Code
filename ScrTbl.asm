@@ -11,7 +11,7 @@ Con16 db 16			;integer constant 16
 EndMsg equ 024h			;"dollar" sign - end of message
 StMsg db CR,LF,LF
 		db 'screen font shoow utility 14 Jun 82 version 1.2',CR,LF
-		db 'copyright (C) 2020 V.B.Maljugin,Voronezh,CIS',CR,LF
+		db 'copyright (C) 2020 3538264,Cape Town,CIS',CR,LF
 CrLf	db CR,LF,EndMsg
 Pattern db 'xx-',EndMsg
 HexSym 	db '0','1','2','3','4','5','6','7'
@@ -71,11 +71,4 @@ ToHex:			;
 			pop cx				;restore counter of enclosed cycle 
 			inc CodSym			;code for first character in next line 
 			
-	EndMain: loop PrtTable				; print next line 
-; === finish program . return code = 0
-			mov ax,4C00h			;function 4Ch - terminate process 
-			int 21h				;DOS service call 
-			end
-			
-
-			
+	EndMain: lo
