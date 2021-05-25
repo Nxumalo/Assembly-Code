@@ -1,6 +1,6 @@
 ;
-;		cursor moving program version 1.226.21.2020
-;		;copyright (C) F.J Nxumalo 2020 University of the Western Cape, South Africa 
+;		cursor moving program
+;		;copyright (C) 3538264, University of the Western Cape, South Africa 
 ;
 .model SMALL				;this defines memory model 
 .stack
