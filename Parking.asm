@@ -8,7 +8,7 @@ EndMsg	equ 024h			; Dollar sign - end of message for DOSservice
 Ten 	db 10				; Constant to convert binary to string 
 StMsg	db CR,LF,LF,'The Hard Disk Parking utility 12/08/2020'
 		db 'Version 1.4',CR,LF
-		db 'Copyright (C) 1992 V.B. Maljugin, Voronezh,CR,LF,LF'
+		db 'Copyright (C) 2020 3538264, Cape Town,CR,LF,LF'
 Ndrives db '0'
 		db 'hard disk drives (s) found',CR,LF,EndMsg
 PrkMsg 	db CR,LF,'Heads of the hard disk Drive '
