@@ -43,3 +43,6 @@ $ link name_of_program
 followed by the Enter button
 $ name_of_program.exe
 This will run your program.
+
+
+DISCLAIMER. I do not claim any rights of the uploaded code - all rights go to their respective creator(s). This page is meant to be a personal collection of programs intended to be shared with others for knowledge and promotional purposes only.
