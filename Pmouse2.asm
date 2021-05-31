@@ -2,7 +2,7 @@
 ;
 ; The demo program for mouse (the menu selection,Text Mode)
 ;
-; Author: F.Nxumalo, Unversity of the Western Cape, 2020
+; Author: 3538264, Unversity of the Western Cape, 2020
 ;
 ; The Interrupt 33h (mouse service is used)
 ;
