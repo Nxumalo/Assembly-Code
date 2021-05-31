@@ -2,7 +2,7 @@
 ;
 ;	The program for outputting text string onto the printer 
 ;
-; 	Author: F. Nxumalo, University of the Western Cape, 2020
+; 	Author: 3538264, University of the Western Cape, 2020
 ;
 ;	The MS-DOS service (INT 21h, function 40h ) is use
 ;
