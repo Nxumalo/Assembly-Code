@@ -2,7 +2,7 @@
 ;
 ; Program for outputting a sound of prescribed tone
 ; 
-; Author: F.Nxumalo Unversity of the Western Cape, South Africa 2019 - 2020
+; Author: 3538264, Unversity of the Western Cape, South Africa 2019 - 2020
 ;___________
 ; Call from Assembler program 
 ;
