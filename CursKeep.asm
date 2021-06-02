@@ -120,7 +120,7 @@ CR	equ 0Ah
 Lf	equ 0Dh
 EndMsg equ 24h
 BegMsg	db CR,LF 'resident cGA-compatible cursor keeper.'
-		db CR,LF 'Copyright(C) 2020 F. Nxumalo Unversity of the Western Cape, South Africa '
+		db CR,LF 'Author, 3538264, Unversity of the Western Cape, South Africa '
 		
 CRLF	db CR,LF,EndMsg
 AlrMsg  db CR,LF,'Program has been installed!',CR,LF,EndMsg
