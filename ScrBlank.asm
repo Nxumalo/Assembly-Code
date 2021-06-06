@@ -58,26 +58,26 @@ Process:	cmp BlankId,Blanked          ; is Screen blanked
 			mov ax,1210h            ; function 12h - set alternate function
 			mov bl,36h              ; subfunction 32h - enable/disable refresh
 			int 10h                 ; BIOS video service call
-;- 			
+;- 		     Restore Register 	
 			mov bx,SaveBXC
 			mov ax,SaveAXC
 	
 ToOld1C:
-		db 0EAh
-		
-OldOffC		dw 0
-OldSegC		dw 0
-Addf:		mov ah,CheckIn
+		db 0EAh                         ; this is code for JMP FAR		
+OldOffC		dw 0                            ; offset will be here 
+OldSegC		dw 0                            ; segment will be here
+;===            Process additional functions of interrupt 1Ch
+Addf:		mov ah,CheckIn                  ; value to be returned into AH
 			mov al,NewFunc
-			iret
+			iret                    ; return from handler 
 SaveAXC dw ?
 SaveBXC dw ?			
 
 Handler endp
-
-Start: 		push cs
-			pop  ds
-			
+;===        Process additional functions of interrupt 1Ch
+Start: 		        push cs            
+			pop  ds                 ; DS = CS - data and code are the same
+;=== 	    Check whether the program is already installed		
 			mov ah,NewFunc
 			mov al,CheckIn
 			int 1Ch
