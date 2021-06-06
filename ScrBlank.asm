@@ -78,12 +78,12 @@ Handler endp
 Start: 		        push cs            
 			pop  ds                 ; DS = CS - data and code are the same
 ;=== 	    Check whether the program is already installed		
-			mov ah,NewFunc
-			mov al,CheckIn
-			int 1Ch
-			cmp ah,CheckIn
-			je Already
-			
+			mov ah,NewFunc          ; new function of INT 1Ch
+			mov al,CheckIn          ; AL - installation check 
+			int 1Ch                 ; call interrupt 1Ch - timer tick 
+			cmp ah,CheckIn          ; does AH contain function number?
+			je Already              ; if YES, handler is already installed 
+;===  	
 Install: 	mov ax,351Ch
 			int 21h
 			mov cs:OldOffC,bx
