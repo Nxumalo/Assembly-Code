@@ -34,14 +34,14 @@ OldSeg9		dw 0                 ; segment will be here
 SaveAX9		dw ?
 SaveBX9		dw ?
 NewInt9 endp
-
-Handler proc near 
-		cmp ah,NewFunc
-		je Addf
-		cmp ActInd,Act'
-		je Process
-		jmp ToOld1C
-		
+; ===
+Handler proc near                    ; additional Handler for Interrupt 1Ch
+		cmp ah,NewFunc       ; additional functions of INT 1Ch?
+		je Addf              ; new Handler for that function 
+		cmp ActInd,Act       ; is activity indicator set?
+		je Process           ; if so, continue work
+		jmp ToOld1C          ; if not, pass control to old Handler 
+; ===         Check whether the screen is already blanked 		
 Process:	cmp BlankId,Blanked
 			je ToOld1C
 			
