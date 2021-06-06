@@ -100,26 +100,26 @@ Install: 	mov ax,351Ch                    ; function 35 - Get Interrupt Vector
 			mov al,09h              ; address of new INT 09 Handler 
 			int 21h                 ; DOS Service call 
 			sti                     ; critical part finishes here
-			
-			mov ActInd,act
-			lea ds,BegMsg
-			mov ah,09h
-			int 21h
-			
-			lea ds,Install
-			add dx,110h
-			mov cx,4
-			shr dx,cl
-			mov ax,3100h
-			int 21h
-			
-Already: 	mov ah,09h
-			lea dx,AlrMsg
-			int 21h
-			
-			mov ax,C01h
-			int 21h
-			
+;=== 	Output the message “Program is installed”				
+			mov ActInd,Act          ; set activity indicator (TSR “ON”)
+			lea ds,BegMsg           ; DX - address of message 
+			mov ah,09h              ; function 09 - Output String 
+			int 21h                 ; DOS Service call
+;===    Calculate the size of the resident
+			lea ds,INSTALL
+			add dx,110h             ; PSP length plus 16 bytes (reserve)
+			mov cx,4                ; set counter for shift 
+			shr dx,cl               ; 4 bits to right - (dividing by 16)
+			mov ax,3100h            ; 31h - terminate and stay resident  
+			int 21h                 ; DOS Service call 
+;===    Process situation “Resident part is already installed”	
+Already: 	        mov ah,09h              ; function 09 - Output Text String 
+			lea dx,AlrMsg           ; DS:DX - address of initial message 
+			int 21h                 ; DOS Service call 
+; Exit Program 			
+			mov ax,C01h             ; function 4Ch - terminate Process 
+			int 21h                 ; DOS Service Call
+;=== 	Data for non-residents part of the Program 		
 CR	equ 0Ah
 LF	equ 0Dh
 EndMsg equ 24h
