@@ -42,9 +42,9 @@ Handler proc near                    ; additional Handler for Interrupt 1Ch
 		je Process           ; if so, continue work
 		jmp ToOld1C          ; if not, pass control to old Handler 
 ; ===         Check whether the screen is already blanked 		
-Process:	cmp BlankId,Blanked
-			je ToOld1C
-			
+Process:	cmp BlankId,Blanked          ; is Screen blanked
+			je ToOld1C           ; if so - nothing to do 
+; ===         Has the time gone?			
 			inc NumTick
 			cmp NumTick,MaxTick
 			jl	ToOld1C
