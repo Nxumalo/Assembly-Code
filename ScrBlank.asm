@@ -45,20 +45,20 @@ Handler proc near                    ; additional Handler for Interrupt 1Ch
 Process:	cmp BlankId,Blanked          ; is Screen blanked
 			je ToOld1C           ; if so - nothing to do 
 ; ===         Has the time gone?			
-			inc NumTick
-			cmp NumTick,MaxTick
-			jl	ToOld1C
-			
-			mov BlankId,Blanked
-			mov NumTick,0
-			
-			mov SaveAXC,ax
+			inc NumTick             ; increase ticks counter
+			cmp NumTick,MaxTick     ; is it time to blank screen
+			j1  ToOld1C             ; if not, proceed to standard handler 
+; ===                Blank the screen			
+			mov BlankId,Blanked     ; set blank indicator 
+			mov NumTick,0           ; clear ticks counter 
+; ===                Save Registers			
+			mov SaveAXC,ax          
 			mov SaveBXC,bx
-			
-			mov ax,1210h
-			mov bl,36h
-			int 10h
-			
+;-                   Blank VGA screen		
+			mov ax,1210h            ; function 12h - set alternate function
+			mov bl,36h              ; subfunction 32h - enable/disable refresh
+			int 10h                 ; BIOS video service call
+;- 			
 			mov bx,SaveBXC
 			mov ax,SaveAXC
 	
