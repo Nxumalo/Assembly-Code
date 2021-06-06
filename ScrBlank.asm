@@ -83,23 +83,23 @@ Start: 		        push cs
 			int 1Ch                 ; call interrupt 1Ch - timer tick 
 			cmp ah,CheckIn          ; does AH contain function number?
 			je Already              ; if YES, handler is already installed 
-;===  	
-Install: 	mov ax,351Ch
-			int 21h
-			mov cs:OldOffC,bx
-			mov cs:OldSegC,es
-			mov al,09h
-			int 21h
-			mov cs:OldOff9,bx
-			mov cs:OldSeg9,es
-			cli
-			mov dx,offset Handler
-			mov ax,251Ch
-			int 21h
-			mov dx,offset NewInt9
-			mov al,09h
-			int 21h
-			sti
+;===  	    Installation part
+Install: 	mov ax,351Ch                    ; function 35 - Get Interrupt Vector 
+			int 21h                 ; DOS service call 
+			mov cs:OldOffC,bx       ; save offset of old handler for 1Ch
+			mov cs:OldSegC,es       ; save segment of old handler for 1Ch 
+			mov al,09h              ; AL - interrupt number, AH keeps 35h
+			int 21h                 ; DOS service call 
+			mov cs:OldOff9,bx       ; seoffset of old handler for 09h
+			mov cs:OldSeg9,es       ; save segment of old handler for 09h
+			cli                     ; caution! critical part of program 
+			mov dx,offset Handler            ; address of handler 
+			mov ax,251Ch                     ; function 25h - Set new Handler 
+			int 21h                 ; DOS Service call 
+			mov dx,offset NewInt9            ; critical part finishes here
+			mov al,09h              ; address of new INT 09 Handler 
+			int 21h                 ; DOS Service call 
+			sti                     ; critical part finishes here
 			
 			mov ActInd,act
 			lea ds,BegMsg
