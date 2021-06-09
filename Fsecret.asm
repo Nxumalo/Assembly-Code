@@ -5,15 +5,19 @@
 ; 00 - installation check
 ; 01 - activates the driver
 ; 02 - deactives the driver
+; 03 - report the driver state
 
+; returns the state in AH ( 1 - on, 2 - off)
+; To call new function put its number into the AH register,
+; The subfunction number into AL and call interrupt 13h
+;
 
-
-NewFunc equ 0E0h
-CheckIn equ 0
-IdSwOn 	equ 1
-IdSwOff equ 2
-RepSt	equ 3
-IdUnIn	equ 4
+NewFunc equ 0E0h        
+CheckIn equ 0            ; subfunction "check installation"
+IdSwOn 	equ 1            ; subfunction "turn program on"
+IdSwOff equ 2            ; subfunction "turn program off"
+RepSt	equ 3            ; subfunction "report status"
+IdUnIn	equ 4            ; subfunction "get resident PSP address"
 InAct	equ 0
 Act		equ 13h
 
