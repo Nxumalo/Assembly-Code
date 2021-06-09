@@ -1,3 +1,13 @@
+; This program installs additional handlers for interrupt 13h
+
+; NEW function 0EFh of interrupt 13h has been added.
+; This function has 3 subfunctions:
+; 00 - installation check
+; 01 - activates the driver
+; 02 - deactives the driver
+
+
+
 NewFunc equ 0E0h
 CheckIn equ 0
 IdSwOn 	equ 1
