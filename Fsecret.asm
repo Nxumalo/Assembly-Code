@@ -125,24 +125,25 @@ Start:		        mov PspAddr,es             ; save address of PSP
 			je  Already                ; if YES, handler is already installed
 ; ===                   installation part 			
 Install:        	mov ah,09                  ; function 09 - text string output
-			lea dx,BegMsg
-			int 21h
-			mov ResPSP,es
-			mov ax,3513h
-			int 21h
-			mov OldOff,bx
-			mov OldSeg,es
-			mov ResOff,offset Handler
-			mov resSeg,ds
-			cli
-			mob dx,ResOff
-			mov ax,2513h
-			int 21h
-			sti
-			mov ActInd,Act
-			lea dx,Loaded
-			mov ah,09h
-			int 21h
+			lea dx,BegMsg              ; DX - address of message 
+			int 21h                    ; DOS service call 
+			mov ResPSP,es              ; save offset of older handler for 13h
+			mov ax,3513h               ; function 35h - Get Interrupt Vector 
+			int 21h                    ; DOS service call
+			mov OldOff,bx              ; save offset of old handler for 13h
+			mov OldSeg,es              ; save segment of old handler for 13h
+			mov ResOff,offset Handler        ; offset of resident part
+			mov resSeg,ds              ; save segment of resident part
+			cli                        ; caution! critical part of program
+			mob dx,ResOff              ; address of handler 
+			mov ax,2513h               ; function 25h - set new handler
+			int 21h                    ; DOS service call 
+			sti                        ; critical part finishes here 
+; ===                   output the message "program is installed"			
+			mov ActInd,Act             ; set activity indicator (TSR "ON")
+			lea dx,Loaded              ; DX - address of message 
+			mov ah,09h                 ; function 25h - set new handler 
+			int 21h                    ; DOS service call
 			
 			lea dx,Install
 			add dx,110h
