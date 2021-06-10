@@ -168,30 +168,31 @@ Already:	        mov es,PspAddr             ; address is already installed
 SkipSep: 	        inc bx                     ; increase counter (skip separator)
 			jmp ChkLtr
 			
-CheckS: 	cmp byte ptr es:[bx]
-			je SkipSep
-			
-ChkLtr:		cmp byte ptr es:[bx]
-			je Help
-			and byte ptr es:[bx],0DFh
-			cmp byte ptr es:[bx],'H'
-			je Help
-			cmp byte ptr es:[bx],'0'
-			jne InvParm
-			add byte ptr es:[bx+1],0DFh
-			cmp byte ptr es:[bx+1],'N'
-			je TurnOn
-			cmp byte ptr es:[bx+1],'F'
-			jne InvParm
-			and byte ptr es:[bx+2],0DFh
-			cmp byte ptr es:[bx+2],'F'
-			jne InvParm
-			mov al,IdSwOff
-			jmp Switch
-			
-Uninst:		mov ah,NewFunc
-			
-			mov al,IdUnIn
+CheckS: 	cmp byte ptr es:[bx],'-'           ; parameters begin with "-"
+			je SkipSep                 ; to skipping separator 			
+ChkLtr:		cmp byte ptr es:[bx],'?'           ; parameters begin with "?"
+			je Help                    ; if so, "Help" function requested
+			and byte ptr es:[bx],0DFh            ; first letter into uppercase   
+			cmp byte ptr es:[bx],'H'             ; is first letter 'H'
+			je  Help                    ; if so, process "Help"
+			cmp byte ptr es:[bx],'D'             ; is first letter 'D'
+			je  UnInst                  ; if so, process "DEINSTALL"
+			cmp byte ptr es:[bx],'O'             ; is first letter 'O'
+			jne InvParm                 ; if not - missing or valid 
+			add byte ptr es:[bx+1],0DFh          ; second letter into uppercase
+			cmp byte ptr es:[bx+1],'N'           ; is second letter 'N'
+			je  TurnOn                  ; if so, process "ON"
+			cmp byte ptr es:[bx+1],'F'           ; is second letter 'F'
+			jne InvParm                 ; if not - invalid parameter 
+			and byte ptr es:[bx+2],0DFh          ; third letter into uppercase
+			cmp byte ptr es:[bx+2],'F'           ; is third letter 'F'
+			jne InvParm                 ; if not, process "INVALID PARMS"
+			mov al,IdSwOff              ; code for subfunction "OFF" into AL
+			jmp Switch                  ; switch program
+; ===      deinstall new handler 			
+Uninst:		        mov ah,NewFunc		    ; AH - code for additional function	
+; -        get information about the resident part (PSP, segment, offset)
+                        mov al,IdUnIn
 			mov es,ComSeg
 			mov bx,offset ResArea
 			
