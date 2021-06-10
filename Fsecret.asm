@@ -105,26 +105,26 @@ BegInst label byte
 ParmInd db 0
 PspAddr dw ?
 ComSeg	dw ?
-ResArea dw 5 dup(?)
+ResArea dw 5 dup(?)            ; buffer subfunction "return PSP"
 RetCode db 0
-Start:		mov PspAddr,es
-			mov sp,0F000h
-			
-			mov es,es:[2Ch]
-			mov ah,49h
-			int 21h
-			
-			mov es,PspAddr
-			mov ComSeg,es
-			mov ds,ComSeg
-			
-			mov ah,NewFunc
-			mov al,CheckIn
-			int 13h
-			cmp ah,CheckIn
-			je  Already
-			
-Install: 	mov ah,09
+Start:		        mov PspAddr,es             ; save address of PSP
+			mov sp,0F000h		   ; set stack at end of program's area
+; ===   Free the enviroment memory block			
+			mov es,es:[2Ch]            ; address of enviroment block int ES
+			mov ah,49h                 ; function 49h - free memory block
+			int 21h                    ; DOS service call
+; ===   			
+			mov es,PspAddr             ; set ES to point to PSP
+			mov ComSeg,es              ; save current command segment
+			mov ds,ComSeg              ; DS = CS - data and code are the same
+; ===                   check whether the program is already installed			
+			mov ah,NewFunc             ; new function of INT 13h
+			mov al,CheckIn             ; AL - installation check
+			int 13h                    ; call interrupt 13h - timer
+			cmp ah,CheckIn             ; does AH contain function number?
+			je  Already                ; if YES, handler is already installed
+; ===                   installation part 			
+Install:        	mov ah,09                  ; function 09 - text string output
 			lea dx,BegMsg
 			int 21h
 			mov ResPSP,es
