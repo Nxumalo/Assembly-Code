@@ -73,23 +73,23 @@ ResPSP: 	        mov ah,IdUnIn            ; value to be returned into AX
 			mov dx,ResPSP
 			mov es:[bx+0],dx         ; segement address of resident PSP
 			mov dx,OldOff
-			mov es:[bx+2],dx
+			mov es:[bx+2],dx         ; offset address of old handler 
 			mov dx,OldSeg
-			mov es:[bx+4],dx
+			mov es:[bx+4],dx         ; segment address of old handler 
 			mov dx,ResOff
-			mov es:[bx+6],dx
+			mov es:[bx+6],dx         ; offset address of this handler 
 			mov dx,ResSeg
-			mov es:[bx+8],dx
-			jmp ExHand
+			mov es:[bx+8],dx         ; segment address of this handler
+			jmp ExHand               ; exit handler 
 		
-Report:		mov ah,IdSwOff
+Report:		        mov ah,IdSwOff
 			cmp ActInd,Act
 			jne ExHand
 			mov ah,IdSwOn
 			
 ExHand: 	mov al,NewFunc
 		popf
-		iret
+		iretf
 		
 Handler endp
 
