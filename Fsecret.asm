@@ -144,29 +144,28 @@ Install:        	mov ah,09                  ; function 09 - text string output
 			lea dx,Loaded              ; DX - address of message 
 			mov ah,09h                 ; function 25h - set new handler 
 			int 21h                    ; DOS service call
-			
+; ===                   calculate the size of the resident part			
 			lea dx,Install
-			add dx,110h
-			mov cx,4
-			shr dx,cl
-			mov ax,3100h
-			int 21h
-			
-NormEx:		mov ds,ComSeg
-			mov ah,09h
-			int 21h
-			mov ah,4Ch
-			mov RetCode,al
-			int 21h
-			
-Already:	mov es,PspAddr
-			cmp byte ptr es:[80h],1
-			jle NoParm
-			mov bx,82h
-			cmp byte ptr es:[bx]
-			jne CheckS
-			
-SkipSep: 	inc bx
+			add dx,110h                ; PSP length plus 16 bytes (reserve)
+			mov cx,4                   ; set counter for shift
+			shr dx,cl                  ; 4 bits to right (dividing by 16)
+			mov ax,3100h               ; 31h - terminate and stay resident 
+			int 21h                    ; DOS service call
+; ===                   Normal exit from program (return code 0)			
+NormEx:		        mov ds,ComSeg              ; restores DS (can be destroyed)
+			mov ah,09h                 ; function 09 - output string 
+			int 21h                    ; DOS service call
+			mov ah,4Ch                 ; function 4Ch - terminate process
+			mov RetCode,al             ; return code into AL 
+			int 21h                    ; DOS service call
+; ===                   Process situation "Resident part is already installed"			
+Already:	        mov es,PspAddr             ; address is already installed 
+			cmp byte ptr es:[80h],1             ; are there parameters
+			jle NoParm                 ; if not, set the indicator "NoParm"
+			mov bx,82h                 ; BX - beginning of parameter string
+			cmp byte ptr es:[bx],'/'             ; parameters begin with "/"?         
+			jne CheckS                 ; if not, check for "-"			
+SkipSep: 	        inc bx                     ; increase counter (skip separator)
 			jmp ChkLtr
 			
 CheckS: 	cmp byte ptr es:[bx]
