@@ -47,33 +47,30 @@ Process:	cmp dl,79h              ; is floppy disk requested?
 RepCod:		cmp ActInd,Act              ; is active mode set?
 		jne ToOld13                 ; if not, jump to old handler
 		mov ah,04h                  ; function 04h - verify sector 
-			
+; ===           Pass control to the standard handler of interrupt 13h			
 ToOld13:
-				db 0EAh
-				
-OldOff dw 0
-OldSeg dw 0
-
-Addf:	 cmp al,CheckIn
+  	   db 0EAh        ; this is code for JMP FAR				
+OldOff     dw 0           ; offset will be here
+OldSeg     dw 0           ; segment will be here 
+; ===      Process additional function of interrupt 13h
+Addf:	         cmp al,CheckIn             ; is installation check required?
 		 je Inst
-		 cmp al,IdSwOn
+		 cmp al,IdSwOn        ; turn driver ON?
 		 je SwOn
-		 cmp al,IdSwOff
+		 cmp al,IdSwOff       ; turn driver OFF?
 		 je Swoff
-		 cmp al,RepSt
+		 cmp al,RepSt         ; report status?
 		 je Report
 		 cmp al,IdUnIn
 		 je RetPSP
-		 jmp ToOld13
-		 
-Inst:		mov ah,CheckIn
-			jmp ExHand
-			
-SwOn:	mov ActInd,Act
-		mov ah,IdSwOn
-		jmp ExHand
+		 jmp ToOld13          ; unknown command-pass to old handler 
+Inst:		 mov ah,CheckIn       ; value to be returned into AH
+		 jmp ExHand           ; exit handler			
+SwOn:	         mov ActInd,Act       ; set indicator to ACTIVE (ON)
+		 mov ah,IdSwOn        ; value to be returned into AH
+		 jmp ExHand           ; exit handler
 		
-ResPSP: 	mov ah,IdUnIn
+ResPSP: 	        mov ah,IdUnIn
 			mov dx,ResPSP
 			mov es:[bx+0],dx
 			mov dx,OldOff
