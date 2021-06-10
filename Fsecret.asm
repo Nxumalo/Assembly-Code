@@ -29,6 +29,7 @@ ResPSP dw ?                ; address of resident PSP
 ResOff dw ?                ; offset of resident part
 ResSeg dw ?                ; segment of resident part 
 ; ========================= RESIDENT CODE ===============================
+
 Handler proc near          ; additional handler for interrupt 13h
 		pushf 
 		cmp ah,NewFunc          ; additional function of INT 13h?
@@ -36,6 +37,7 @@ Handler proc near          ; additional handler for interrupt 13h
 		cmp ActInd,Act          ; is activity indicator set?
 		jne ToOld13             ; if so, continue work
 ; ===           Check whether the screen is already blanked 		
+
 Process:	        cmp dl,79h               ; is floppy disk requested?
 			ja ToOld13               ; if not, jump to old handler
 			cmp ah,03h               ; function 03 - write sector 
@@ -44,15 +46,18 @@ Process:	        cmp dl,79h               ; is floppy disk requested?
 			je RepCod                ; new handler for function 0Bh
 			jmp ToOld13              ; others processed by older handler
 ; ===           Process write commands 		
+
 RepCod:		cmp ActInd,Act              ; is active mode set?
 		jne ToOld13                 ; if not, jump to old handler
 		mov ah,04h                  ; function 04h - verify sector 
 ; ===           Pass control to the standard handler of interrupt 13h			
+
 ToOld13:
   	   db 0EAh        ; this is code for JMP FAR				
 OldOff     dw 0           ; offset will be here
 OldSeg     dw 0           ; segment will be here 
 ; ===      Process additional function of interrupt 13h
+
 Addf:	         cmp al,CheckIn       ; is installation check required?
 		 je Inst
 		 cmp al,IdSwOn        ; turn driver ON?
@@ -64,11 +69,14 @@ Addf:	         cmp al,CheckIn       ; is installation check required?
 		 cmp al,IdUnIn
 		 je RetPSP
 		 jmp ToOld13          ; unknown command-pass to old handler 
+
 Inst:		 mov ah,CheckIn       ; value to be returned into AH
 		 jmp ExHand           ; exit handler			
+
 SwOn:	         mov ActInd,Act       ; set indicator to ACTIVE (ON)
 		 mov ah,IdSwOn        ; value to be returned into AH
 		 jmp ExHand           ; exit handler		
+
 ResPSP: 	        mov ah,IdUnIn            ; value to be returned into AX
 			mov dx,ResPSP
 			mov es:[bx+0],dx         ; segement address of resident PSP
@@ -80,19 +88,19 @@ ResPSP: 	        mov ah,IdUnIn            ; value to be returned into AX
 			mov es:[bx+6],dx         ; offset address of this handler 
 			mov dx,ResSeg
 			mov es:[bx+8],dx         ; segment address of this handler
-			jmp ExHand               ; exit handler 
-		
-Report:		        mov ah,IdSwOff
-			cmp ActInd,Act
-			jne ExHand
-			mov ah,IdSwOn
-			
-ExHand: 	mov al,NewFunc
+			jmp ExHand               ; exit handler 		
+
+Report:		        mov ah,IdSwOff           ; prepare "INACTIVE" code for returning
+			cmp ActInd,Act           ; is activity indicator set?
+			jne ExHand               ; if not, exit handler 
+			mov ah,IdSwOn            ; return "Active" code
+					
+ExHand: 	mov al,NewFunc           ; return additional signature in AL
 		popf
-		iretf
+		iretf          ; return from handler
 		
 Handler endp
-
+; === Installation part of the program
 BegInst label byte
 ParmInd db 0
 PspAddr dw ?
