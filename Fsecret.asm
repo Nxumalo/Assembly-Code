@@ -192,63 +192,62 @@ ChkLtr:		cmp byte ptr es:[bx],'?'           ; parameters begin with "?"
 ; ===      deinstall new handler 			
 Uninst:		        mov ah,NewFunc		    ; AH - code for additional function	
 ; -        get information about the resident part (PSP, segment, offset)
-                        mov al,IdUnIn
-			mov es,ComSeg
-			mov bx,offset ResArea
-			
-			int 13h
-			mov ax,3513h
-			int 21h
-			
-			mov ax,es
-			cmp ax,ResArea[8]
-			jne Over
-			cmp bx,ResArea[6]
-			jne Over
-			
-			mov es,ResArea[0]
-			mov ah,49h
-			int 21h
-			
-			mov ds,ResArea[4]
-			mov dx,ResArea[2]
-			mov acm2513h
-			int 21h
-			mov ds,ComSeg
-			
-			lea dx,UnInMsg
-			jmp NormEx
-			
-Over:		lea dx,OverMsg
-			jmp NormEx
-			
-TurnOn: 	mov al,IdSwOn
-			
-Switch:		mov ah,NewFunc
-			int 13h
-			
-NoParm: 	mov ah,NewFunc
-			mov al,RepSt
-			int 13h
-			lea dx,MakeOff
-			cmp ah,IdSwOn
-			jne FinTst
-			lea dx,MakeOn
-			
-FinTst: 	jmp NormEx
-			
-Help:		lea dx,BegMsg
-Help2:		mov ah,09h
-			int 21h
-			lea dx,ParmTxt
-			jmp NormEx
-			
-InvParm:	lea dx,Invalid
-			mov retCode,1
-			jmp Help2
-			
-CR			equ 0Ah
-LF			equ 0Dh
+                        mov al,IdUnIn               ; AL - subfunction "deinstallation"
+			mov es,ComSeg               ; ES points to current segment 
+			mov bx,offset ResArea            ; ES:BX - buffer for "return PSP"
+; -        get information about current handler of interrupt 13			
+			int 13h                     ; call new handler of interrupt 13h
+			mov ax,3513h                ; function 35h - get interrupt vector 
+			int 21h                     ; DOS service call
+; -        is the resident part of this program last handler of INT 13h?			
+			mov ax,es                   ; AX - segment of current handler 
+			cmp ax,ResArea[8]           ; segment of resident part
+			jne Over           ; if not equal - res. part overridden      
+			cmp bx,ResArea[6]           ; compare offsets
+			jne Over           ; if not equal - res. part overridden
+; -        free memory occupied by the resident part of TSR			
+			mov es,ResArea[0]           ; address of resident PSP into ES
+			mov ah,49h                  ; function 49h - free memory block 
+			int 21h            ; DOS service call 
+; -        make previous handler of interrupt 13 current 			
+			mov ds,ResArea[4]          ; DS - segment of old handler 
+			mov dx,ResArea[2]          ; DX - offset of old handler 
+			mov acm2513h               ; function 25h - set interrupt vector 
+			int 21h            ; DOS service call
+			mov ds,ComSeg              ; restore data segement register 
+; -        leave program			
+			lea dx,UnInMsg             ; DS:DX - point to message "deinstalled"
+			jmp NormEx                 ; leave program
+; -        process situation "TSR Overridden"			
+Over:		lea dx,OverMsg                     ; DS:DX - point to message "overridden"
+		jmp NormEx                 ; leave program
+; ===      Turn the program ON			
+TurnOn: 	mov al,IdSwOn              ; subfunction "TURN ON"
+; ===      This block switches program state			
+Switch:		mov ah,NewFunc             ; AH - code for additional function
+		int 13h            ; call new handler of interrupt 13h
+; ===      Process the situation "no parameter"			
+NoParm: 	mov ah,NewFunc             ; AH - code for additional function
+		mov al,RepSt               ; AL - subfunction "report status"
+		int 13h            ; call new handler of interrupt 13h
+		lea dx,MakeOff             ; DS:DX - message "turn OFF"
+		cmp ah,IdSwOn              ; is code "turned ON" returned?
+		jne FinTst         ; if not, exit;  "OFF" will be output
+		lea dx,MakeOn              ; DS:DX - message "turned ON"			
+FinTst: 	jmp NormEx         ; to print message and exit 
+; ===      Output help message			
+Help:		lea dx,BegMsg              ; DS:DX - address of initial message
+Help2:		mov ah,09h         ; function 09 - output text string 
+		int 21h            ; DOS service call 
+		lea dx,ParmTxt             ; DS:DX - address of HELP message
+		jmp NormEx         ; to print message and exit 
+; ===	   Process the situation "INVALID PARAMETERS"		
+InvParm:	lea dx,Invalid             ; DS:DX address of message "invalid"
+		mov retCode,1              ; return code = 1 
+		jmp Help2                  ; to print message and exit 
+; ===      Data for non-resident part of the program			
+CR		equ 0Ah
+LF		equ 0Dh
 EndMsg		equ 24h
 Invalid 	db CR,LF,'Cannot interpret parameters specified.'
 			db CR,LF,'Command line is:'CR,LF,EndMsg
@@ -274,14 +273,3 @@ OverMsg 	db CR,LF,'FSecret is not last handler of INT 13h.'
 UnInMsg 	db CR,LF,'Program FSecret deinstalled.',EndMsg
 _Text		ends
 			end Start
-				
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
