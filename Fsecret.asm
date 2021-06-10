@@ -18,12 +18,12 @@ IdSwOn 	equ 1            ; subfunction "turn program on"
 IdSwOff equ 2            ; subfunction "turn program off"
 RepSt	equ 3            ; subfunction "report status"
 IdUnIn	equ 4            ; subfunction "get resident PSP address"
-InAct	equ 0
-Act		equ 13h
+InAct	equ 0            ; this value indicates "INACTIVE"
+Act		equ 13h                ; this value indicates "ACTIVE"
 
 _Text segment para public 'CODE'
 	assume cs:_Text
-	
+; ======================= RESIDENT DATA	 ===============================
 ActInd db Act
 ResPSP dw ?
 ResOff dw ?
