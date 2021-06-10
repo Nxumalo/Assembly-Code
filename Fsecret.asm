@@ -36,7 +36,7 @@ Handler proc near          ; additional handler for interrupt 13h
 		cmp ActInd,Act          ; is activity indicator set?
 		jne ToOld13             ; if so, continue work
 ; ===           Check whether the screen is already blanked 		
-Process:	cmp dl,79h              ; is floppy disk requested?
+Process:	        cmp dl,79h               ; is floppy disk requested?
 			ja ToOld13               ; if not, jump to old handler
 			cmp ah,03h               ; function 03 - write sector 
 			je RepCod                ; new handler for function 03
@@ -53,7 +53,7 @@ ToOld13:
 OldOff     dw 0           ; offset will be here
 OldSeg     dw 0           ; segment will be here 
 ; ===      Process additional function of interrupt 13h
-Addf:	         cmp al,CheckIn             ; is installation check required?
+Addf:	         cmp al,CheckIn       ; is installation check required?
 		 je Inst
 		 cmp al,IdSwOn        ; turn driver ON?
 		 je SwOn
@@ -68,11 +68,10 @@ Inst:		 mov ah,CheckIn       ; value to be returned into AH
 		 jmp ExHand           ; exit handler			
 SwOn:	         mov ActInd,Act       ; set indicator to ACTIVE (ON)
 		 mov ah,IdSwOn        ; value to be returned into AH
-		 jmp ExHand           ; exit handler
-		
-ResPSP: 	        mov ah,IdUnIn
+		 jmp ExHand           ; exit handler		
+ResPSP: 	        mov ah,IdUnIn            ; value to be returned into AX
 			mov dx,ResPSP
-			mov es:[bx+0],dx
+			mov es:[bx+0],dx         ; segement address of resident PSP
 			mov dx,OldOff
 			mov es:[bx+2],dx
 			mov dx,OldSeg
