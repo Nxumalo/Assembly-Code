@@ -23,32 +23,30 @@ Act		equ 13h                ; this value indicates "ACTIVE"
 
 _Text segment para public 'CODE'
 	assume cs:_Text
-; ======================= RESIDENT DATA	 ===============================
-ActInd db Act
-ResPSP dw ?
-ResOff dw ?
-ResSeg dw ?
-
-Handler proc near
+; ========================= RESIDENT DATA ===============================
+ActInd db Act              ; activity indicator if 0 - inactive 
+ResPSP dw ?                ; address of resident PSP
+ResOff dw ?                ; offset of resident part
+ResSeg dw ?                ; segment of resident part 
+; ========================= RESIDENT CODE ===============================
+Handler proc near          ; additional handler for interrupt 13h
 		pushf 
-		cmp ah,NewFunc
-		je Addf
-		cmp ActInd,Act
-		jne ToOld13
-		
-Process:	cmp dl,79h
-			ja ToOld13
-			cmp ah,03h
-			je RepCod
-			cmp ah,03h
-			je RepCod
-			cmp ah,0Bh
-			je RepCod
-			jmp ToOld13
-		
-RepCod:		cmp ActInd,Act
-			jne ToOld13
-			mov ah,04h
+		cmp ah,NewFunc          ; additional function of INT 13h?
+		je Addf                 ; new handler for that function 
+		cmp ActInd,Act          ; is activity indicator set?
+		jne ToOld13             ; if so, continue work
+; ===           Check whether the screen is already blanked 		
+Process:	cmp dl,79h              ; is floppy disk requested?
+			ja ToOld13               ; if not, jump to old handler
+			cmp ah,03h               ; function 03 - write sector 
+			je RepCod                ; new handler for function 03
+			cmp ah,0Bh               ; function 0B - write long sector 
+			je RepCod                ; new handler for function 0Bh
+			jmp ToOld13              ; others processed by older handler
+; ===           Process write commands 		
+RepCod:		cmp ActInd,Act              ; is active mode set?
+		jne ToOld13                 ; if not, jump to old handler
+		mov ah,04h                  ; function 04h - verify sector 
 			
 ToOld13:
 				db 0EAh
