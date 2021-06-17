@@ -15,7 +15,7 @@ void main(){
 	static int Q,S,j;
 	static char TEXT23[] = {"Enter command line press ESC to exit"};
 	static char TEXT1 [] = {"Input and process an MS-DOS command "
-							" Author : F. Nxumalo, Cape Town Muizenberg , 2020"};
+							" Author : 3538264, Cape Town Muizenberg , 2019-2021"};
 	static char COMSTR [81];
 	
 	*(W+1) = 0;
