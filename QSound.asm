@@ -50,26 +50,26 @@ Sound: 		mov al,1011011b            ; channel 2, write lab/msb,
 			div di             ; obtain frequency divisor
 			out 42h,al         ; send low byte of divisor
 			mov al,ah          ; prepare for sending high byte 
-			out 42h,al         ; send high 
-			
-			in al,61h
-			or al,00000011b
-			out 61h,al
-			
-ToTicks:	mov ax,40h
-			mov es,ax
-			
-			mov bx,es:[6Ch]
-			add bx,Nticks
-			mov dx,es:[6Eh]
-			
-Delay:		cmp es:[6Eh],dx
-			jb Delay
-			cmp es:[6Ch],bx
-			jb Delay
-			
-IsTime:		in al,61h
-			and al, not 0000011b
+			out 42h,al         ; send high byte of divisor
+; === turn the sound on			
+			in al,61h          ; read speaker port content
+			or al,00000011b         ; set bits 0 and 1 of port 61h to 1
+			out 61h,al         ; turn speaker on 
+; === get current time (the number of ticks since midnight)			
+ToTicks:	        mov ax,40h         ; address of BIOS data segment into AX
+			mov es,ax          ; ES will point to BIOS data segment 
+; === calculate when the sound is turn off			
+			mov bx,es:[6Ch]    ; low part of ticks number into BX
+			add bx,Nticks      ; add DURAT to that low part value 
+			mov dx,es:[6Eh]    ; save high part of ticks number 
+; === wait for the obtained number of ticks defined by DURAT parameter 			
+Delay:		        cmp es:[6Eh],dx    ; Is high part of time counter right?
+			jb Delay           ; if not, continue to wait 
+			cmp es:[6Ch],bx    ; has time gone?
+			jb Delay           ; if not, continue to wait
+; === turn the speaker off 			
+IsTime:		        in al,61h          ; read speaker port contents
+			and al, not 0000011b      ; set bits 0 and 1 
 			out 61h,al
 			
 			mov al,00110110b
