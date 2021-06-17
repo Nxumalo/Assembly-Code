@@ -69,15 +69,15 @@ Delay:		        cmp es:[6Eh],dx    ; Is high part of time counter right?
 			jb Delay           ; if not, continue to wait
 ; === turn the speaker off 			
 IsTime:		        in al,61h          ; read speaker port contents
-			and al, not 0000011b      ; set bits 0 and 1 
-			out 61h,al
-			
+			and al, not 0000011b   ; set bits 0 and 1 of port 61h to 1
+			out 61h,al         ; turn speaker off
+; === restore the latch of the timer channel 0 (default value is 0FFFFh)			
 			mov al,00110110b
 			out 43h,al
-			mov al,0FFh
-			out 40h,al
-			out 40h,al
-			
+			mov al,0FFh        ; this is low byte of value 65535
+			out 40h,al         ; send low byte of latch value (65535)
+			out 40h,al         ; send high byte of latch value (65535)
+; === return to caller 			
 			ret
 Qsound		endp
 			end
